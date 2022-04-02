@@ -1,0 +1,6 @@
+For example POSIX pthread_mutex_trylock() API. When the mutex is not available the function returns immediately whereas the API pthread_mutex_lock() blocks the thread till the resource is available. 
+
+The typical difference is that threads (of the same process) run in a shared memory space, while processes run in separate memory spaces.
+
+compiling codeVault
+	gcc -g -pthread codevault.c
