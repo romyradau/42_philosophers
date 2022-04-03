@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   codevault.c                                        :+:      :+:    :+:   */
+/*   create_threads.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/02 18:51:46 by rschleic          #+#    #+#             */
-/*   Updated: 2022/04/02 21:34:14 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/04/03 16:25:00 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,28 +32,6 @@ void	*routine()
 	// sleep(3);
 	// printf("what you gonna do\n");
 }
-
-// void	give_birth()
-// 	/*	for (i = 0; i < 4; i++)
-// 	{
-// 		if (pthread_create(&ph[i], NULL, &routine, NULL) != 0)
-// 		//last para is for the args for the function which we dont have yet
-// 		{
-// 			perror("Failed to create thread");
-// 			return (1);
-// 		}
-// 		printf("philosopher	%d starts eating \n", i);
-// 	}*/
-// void	update()
-// 	/*
-// 	for (i = 0; i < 4; i++)
-// 	{
-// 		if (pthread_join(ph[i], NULL))
-// 		//==wait but for threads, 2nd para == pointer that gets the result from this thread
-// 			return (2);
-// 		printf("philosopher	%d stops eating\n", i);
-// 	}
-// 	*/
 
 int	main(int argc, char **argv)
 {
