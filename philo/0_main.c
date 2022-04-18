@@ -56,6 +56,7 @@ t_philly *philly_cdll(t_data **data)
 		i--;
 	}
 	//doesn't need to be protected ft_calloc manages
+	//needs the initializition of the fork mutexes
 	return ((*data)->first_ph)
 }
 
@@ -100,14 +101,29 @@ int	create_phillys(t_data **data)
 	return (0);
 }
 
-int	init_mutex(t_data **data)
+int	set_fork_mutexes(t_data **data)
 {
+	int i;
+	int j;
+
+
+	// pthread_mutex_t fork;
+	i = data->noph;
+	j = 0;
+
+	while (i > 0)
+	{
+		//muss ich die forks(mutex) allocaten??
+		pthread_mutex_init(fork, NULL);//while == forks
+		i--;
+
+	}
 		//here just init all the mutexs
 		//do i have to do this for every philosopher?
-		pthread_mutex_init(phil->next_fork, NULL);//while == forks
 		pthread_mutex_init(phil->prev_fork, NULL);//while == forks
 		// pthread_mutex_init(phil->if_dead_no_eat, NULL);//while == forks
 }
+//nur gabeln und schauen was schief schlagt
 
 int	clear_table(t_data **data)
 {
@@ -132,12 +148,12 @@ int	main(int argc, char **argv)
 	
 	if (input_check(argc))
 		return (1);
-	//checks argc
+	//unvollständig
 	data = ft_calloc(1, sizeof(t_data));
 	//pointer auf data wird gemalloct
 	data = init_args(argv);
 	//doesn't need to be protected ft_calloc handles
-	init_mutex(&data);
+	set_fork_mutexes(data);
 	if (create_phillys(&data))
 		return (1);
 	clear_table(&data);

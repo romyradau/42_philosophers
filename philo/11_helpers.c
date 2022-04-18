@@ -39,6 +39,8 @@ int	input_check(int x)
 	return (0);
 }
 //which input is also wrong?
+//int min int max
+//muss zahl sein
 
 int	ft_atoi(const char *str)
 {
