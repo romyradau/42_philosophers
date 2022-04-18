@@ -18,7 +18,7 @@
 #include <limits.h>
 #include "philo.h"
 
-void	*routine(t_data *data, t_philly		*first_thread)
+void	*routine(t_data *data, t_philly *first_thread)
 {
 	int		meals;
 
@@ -41,40 +41,58 @@ void	*routine(t_data *data, t_philly		*first_thread)
 //eat
 //sleep...
 
-int	join_phillys(t_data *data, pthread_t *phil)
+t_philly *philly_cdll(t_data **data)
 {
+	//function that creates cdll
 	int	i;
-
-	i = data->noph;
+	t_philly *phil;
+	
+	i = (*data)->noph;
+	(*data)->first_ph = phil;
 	while (i > 0)
 	{
-		if (pthread_join(phil[i], NULL) != 0)
+		phil = ft_calloc(1, sizeof(t_philly))
+		phil = phil->next;
+		i--;
+	}
+	//doesn't need to be protected ft_calloc manages
+	return ((*data)->first_ph)
+}
+
+int	join_phillys(t_data *data, pthread_t *phil)
+{
+	t_philly	*tmp_ph;
+
+	tmp_ph = data->first_thread
+	while (1)
+	{
+		if (pthread_join(tmp_ph->thread, NULL) != 0)
 			return (2);
 			//welcher fehler soll hier kommen?
-		i--;
+		tmp_ph = tmp_ph->next;
+		if (tmp_ph == data->first_ph)
+			break ;
 	}
 	return (0);
 }
 
 
-int	create_phillys(t_data *data)
+int	create_phillys(t_data **data)
 {
-	int				i;
-	t_philly		*phil;
-	
-	i = data->noph;
-	phil = data->first_thread;
-	// linked list create 
-	
+	t_philly	*tmp_ph;
 
-	while (i > 0)
+	tmp_ph = philly_cdll()
+	//zeigt jetzt auf den ersten
+	while (1)
 	{
-		if (pthread_create(phil->thread, NULL, &routine, phil) != 0)
+		if (pthread_create(tmp_ph->thread, NULL, &routine, tmp_ph->thread) != 0)
 		{
 			perror("Failed to create thread");
 			return (1);
 		}
-		i--;
+		tmp_ph = tmp_ph->next;
+		if (tmp_ph == (*data)->first_ph)
+			break ;
 	}
 	if (join_phillys(data, phil))
 		return (1);
@@ -82,20 +100,13 @@ int	create_phillys(t_data *data)
 	return (0);
 }
 
-int	set_table(t_data **data)
+int	init_mutex(t_data **data)
 {
-	int	i;
-	t_philly *phil;
-	
-	i = (*data)->noph;
-	phil = (*data)->first_thread;
-	while (i > 0)
-	{
-		pthread_mutex_init(phil->left_fork, NULL);//while == forks
-		pthread_mutex_init(phil->right_fork, NULL);//while == forks
-		pthread_mutex_init(phil->if_dead_no_eat, NULL);//while == forks
-		phil = phil->next;
-	}
+		//here just init all the mutexs
+		//do i have to do this for every philosopher?
+		pthread_mutex_init(phil->next_fork, NULL);//while == forks
+		pthread_mutex_init(phil->prev_fork, NULL);//while == forks
+		// pthread_mutex_init(phil->if_dead_no_eat, NULL);//while == forks
 }
 
 int	clear_table(t_data **data)
@@ -104,7 +115,7 @@ int	clear_table(t_data **data)
 	t_philly *phil;
 	
 	i = (*data)->noph;
-	phil = (*data)->first_thread;
+	phil = (*data)->first_ph;
 	while (i > 0)
 	{
 		pthread_mutex_destroy(phil->left_fork);//while == forks
@@ -119,14 +130,14 @@ int	main(int argc, char **argv)
 {
 	t_data	*data;
 	
+	if (input_check(argc))
+		return (1);
+	//checks argc
 	data = ft_calloc(1, sizeof(t_data));
 	//pointer auf data wird gemalloct
 	data = init_args(argv);
 	//doesn't need to be protected ft_calloc handles
-	if (input_check(argc))
-		return (1);
-	//checks argc
-	set_table(&data);
+	init_mutex(&data);
 	if (create_phillys(&data))
 		return (1);
 	clear_table(&data);

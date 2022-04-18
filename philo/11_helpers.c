@@ -38,6 +38,7 @@ int	input_check(int x)
 	}
 	return (0);
 }
+//which input is also wrong?
 
 int	ft_atoi(const char *str)
 {

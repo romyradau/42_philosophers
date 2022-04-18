@@ -24,6 +24,7 @@
 typedef struct s_philly
 {
 	pthread_t		thread;
+	int				id;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*if_dead_no_eat;
@@ -40,7 +41,7 @@ typedef struct s_data
 	int				notephme;
 	pthread_mutex_t	*forks;
 	//array mit anzahl von threads
-	t_philly		*first_thread;
+	t_philly		*first_ph;
 }	t_data;
 
 // typedef struct s_mutex
