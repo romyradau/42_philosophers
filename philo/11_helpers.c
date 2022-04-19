@@ -12,37 +12,8 @@
 
 #include "philo.h"
 
-t_data	*init_args(char **argv)
-{
-	t_data	args;
-	
-	args.noph = ft_atoi(argv[1]);
-	args.ttd = ft_atoi(argv[1]);
-	args.tte = ft_atoi(argv[2]);
-	args.tts = ft_atoi(argv[3]);
-	
-	return (&args);
-}
 
-int	input_check(int x)
-{
-	if (x > 5)
-	{
-		printf("too many arguments\n");
-		return (1);
-	}
-	if (x < 4)
-	{
-		printf("too few arguments\n");
-		return (1);
-	}
-	return (0);
-}
-//which input is also wrong?
-//int min int max
-//muss zahl sein
-
-int	ft_atoi(const char *str)
+long	ft_atoi(const char *str)
 {
 	int		counter;
 	long	output;
@@ -64,9 +35,9 @@ int	ft_atoi(const char *str)
 	{
 		output = output * 10 + str[counter++] - '0';
 		if (sign == -1 && output > (long) INT_MAX + 1)
-			return (-1);
+			return (sign * output);
 		else if (sign == 1 && output > INT_MAX)
-			return (-2);
+			return (sign * output);
 	}
 	return (sign * output);
 }

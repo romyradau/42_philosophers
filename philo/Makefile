@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 RM = rm -f
 NAME = philo
-SOURCES = 0_main.c 1_create_phillys.c 2_give_phillys_data.c 11_helpers.c
+SOURCES = 0_main.c 1_input.c 2_creation.c 3_routine.c 11_helpers.c
 OBJECTS = $(SOURCES:.c=.o)
 
 all: $(NAME)
