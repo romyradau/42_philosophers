@@ -62,3 +62,15 @@ void	*ft_calloc(size_t count, size_t size)
 	}
 	return (ptr);
 }
+
+// void	ft_bzero(void *s, size_t n)
+// {
+// 	size_t	counter;
+
+// 	counter = 0;
+// 	while (counter < n)
+// 	{
+// 		((char *)s)[counter] = '\0';
+// 		counter++;
+// 	}
+// }
