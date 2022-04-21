@@ -54,6 +54,7 @@ void	*ft_calloc(size_t count, size_t size)
 	{
 		write(2, "ERROR: malloc failed\n", 22);
 		exit(1);
+		//obacht
 	}
 	while (counter < count * size)
 	{

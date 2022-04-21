@@ -58,68 +58,46 @@ int	join_phillys(t_data *data)
 
 t_philly *philly_cdll(t_data **data)
 {
-	//1 philo structs allocieren
-	//id init
-	//2 mutex allocieren
-	//3 mutex initilizen
 	int i;
-	t_philly *phil;
-	//geht das auch wenn es kein long ist?
-	i = 0;
-	phil = NULL;
-	while (i < (*data)->noph)
-	{
-		if ((*data)->first_ph == NULL)
-		{
-			phil = ft_calloc(1, sizeof(t_philly));
-			//ericht es dass ft_calloc exited?
-			//an sich ist data bis dahin allocated...
-			//morgen tim fragen
-			phil->id = i;
-			phil->args = (*data);
-			phil->right_fork = ft_calloc(1, sizeof(pthread_mutex_t));
-			pthread_mutex_init(&phil->right_fork, NULL);
-			phil->next = phil;
-			phil->prev = phil;
-			(*data)->first_ph = phil;
-		}
-		//ersten philo erstellt...
-		//jetzt wenn mehrere da sind...
-	}
+	t_philly *current;
 
-	//function that creates cdll
-	// int	i;
-	// t_philly *phil;
-	
-	// i = (*data)->noph;
-	// phil = (*data)->first_ph;
-	// while (i > 0)
-	// {
-	// 	phil = ft_calloc(1, sizeof(t_philly));
-	// 	phil = phil->next;
-	// 	i--;
-	// }
-	//doesn't need to be protected ft_calloc manages
-	//needs the initializition of the fork mutexes
+	i = 0;
+	(*data)->first_ph = ft_calloc(1, sizeof(t_philly));
+	//gescheit protecten
+	current = (*data)->first_ph;
+	pthread_mutex_init(&current->right_fork, NULL);
+	while (i < (*data)->noph - 1)
+	{
+		current->next = ft_calloc(1, sizeof(t_philly));
+		current = current->next;
+		pthread_mutex_init(&current->right_fork, NULL);
+		i++;
+	}
+	current->next = (*data)->first_ph;
 	return ((*data)->first_ph);
 }
 
 
 int	create_phillys(t_data **data)
 {
-	t_philly	*tmp_ph;
+	t_philly	*head;
+	int			i;
 
-	tmp_ph = philly_cdll(data);
+	i = 1;
+	head = philly_cdll(data);
 	//zeigt jetzt auf den ersten
 	while (1)
 	{
-		// if (pthread_create(&tmp_ph->thread, NULL, &routine, tmp_ph->thread) != 0)
-		// {
-		// 	perror("Failed to create thread");
-		// 	return (1);
-		// }
-		tmp_ph = tmp_ph->next;
-		if (tmp_ph == (*data)->first_ph)
+		head->id = i;
+		head->args = (*data);
+		head->left_fork = head->next->right_fork;
+		if (pthread_create(&current->thread, NULL, &routine, current->thread) != 0)
+		{
+			perror("Failed to create thread");
+			return (1);
+		}
+		head = head->next;
+		if (head == (*data)->first_ph)
 			break ;
 	}
 	if (join_phillys((*data)))
@@ -128,11 +106,9 @@ int	create_phillys(t_data **data)
 	return (0);
 }
 
-// int	set_fork_mutexes(t_data **data)
-// {
-
-// }
-// //nur gabeln und schauen was schief schlagt
+//init phillys
+//cdll phillys
+//free phillys - 1)struct malloc 2)die ganzen values?
 
 int	clear_table(t_data **data)
 {
@@ -159,7 +135,6 @@ int	main(int argc, char **argv)
 	//unvollständig
 	data = ft_calloc(1, sizeof(t_data));
 	//pointer auf data wird gemalloct
-	printf("first_ph	%p\n", data->first_ph);
 	if (init_args(argv, data) == 1)
 	{
 		free(data);
