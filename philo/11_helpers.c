@@ -52,9 +52,8 @@ void	*ft_calloc(size_t count, size_t size)
 	ptr = malloc(count * size);
 	if (ptr == NULL)
 	{
-		write(2, "ERROR: malloc failed\n", 22);
-		exit(1);
-		//obacht
+		printf("malloc failed\n");
+		return (ptr);
 	}
 	while (counter < count * size)
 	{

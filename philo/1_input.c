@@ -27,8 +27,6 @@ int	max_min_check(t_data *data)
 		printf("wrong input\n");
 		return (1);
 	}
-	printf("string	%ld\n", data->noph);
-
 	return (0);
 }
 

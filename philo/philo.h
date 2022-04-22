@@ -46,7 +46,7 @@ typedef struct s_philly
 	pthread_mutex_t	*left_fork;//create_phillys, weil ich ersta lle philosophen habe
 	t_data			*args;
 	struct s_philly		*next;
-	struct s_philly		*prev;
+	// struct s_philly		*prev;
 }	t_philly;
 
 

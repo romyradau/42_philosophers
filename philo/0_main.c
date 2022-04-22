@@ -18,57 +18,102 @@
 #include <limits.h>
 #include "philo.h"
 
-// void	*routine(t_data *data, t_philly *first_thread)
-// {
-// 	int		meals;
+void	*routine(void *philo)
+{
+	t_philly *head;
 
-// 	meals = data->notephme;
-// 	if (data->notephme > 0)
-// 	{
-// 		while (meals > 0)
-// 		{
-// 			pthread_mutex_lock(first_thread->left_fork);
-// 			pthread_mutex_lock(&first_thread->right_fork);
-// 			//this function waits and locks and does everything
-// 			meals--;
-// 			pthread_mutex_unlock(first_thread->left_fork);
-// 			pthread_mutex_unlock(&first_thread->right_fork);
-// 		}
-// 	}
-// }
+	head = (t_philly *)philo;
+	// int		meals;
+
+	// meals = data->notephme;
+	// if (data->notephme > 0)
+	// {
+	// 	while (meals > 0)
+	// 	{
+	// 		pthread_mutex_lock(head->left_fork);
+	// 		pthread_mutex_lock(&head->right_fork);
+	// 		//this function waits and locks and does everything
+	// 		meals--;
+	// 		pthread_mutex_unlock(head->left_fork);
+	// 		pthread_mutex_unlock(&head->right_fork);
+	// 	}
+	// }
+	return (NULL);
+}
 //eat
 //sleep...
 
-int	join_phillys(t_data *data)
+void	free_phillys(t_data **data, int i)
 {
-	t_philly	*tmp_ph;
+	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
+	// t_philly *current;
+	t_philly *next_ph;
 
-	tmp_ph = data->first_ph;
+	// current = (*data)->first_ph;
+	while (i > 1)
+	{
+		printf("hallo\n");
+		if ((*data)->first_ph->next)
+			next_ph = (*data)->first_ph->next;
+		pthread_mutex_destroy(&(*data)->first_ph->right_fork);
+		free((*data)->first_ph);
+		// current = NULL;
+		printf("%p\n", (*data)->first_ph);
+		(*data)->first_ph = next_ph;
+		i--;
+	}
+	pthread_mutex_destroy(&(*data)->first_ph->right_fork);
+	free((*data)->first_ph);
+	// current = NULL;
+	printf("%p\n\n", (*data)->first_ph);
+	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
+
+}
+//freet nicht wies soll
+
+
+int	join_phillys(t_data **data)
+{
+	t_philly	*head;
+
+	head = (*data)->first_ph;
 	while (1)
 	{
-		if (pthread_join(tmp_ph->thread, NULL) != 0)
+		if (pthread_join(head->thread, NULL) != 0)
+		{
+			free_phillys(data, (*data)->noph);
+			printf("failed to join thread\n");
 			return (2);
+		}
 			//welcher fehler soll hier kommen?
-		tmp_ph = tmp_ph->next;
-		if (tmp_ph == data->first_ph)
+		head = head->next;
+		if (head == (*data)->first_ph)
 			break ;
 	}
 	return (0);
 }
+
 
 t_philly *philly_cdll(t_data **data)
 {
 	int i;
 	t_philly *current;
 
-	i = 0;
+	i = 1;
 	(*data)->first_ph = ft_calloc(1, sizeof(t_philly));
-	//gescheit protecten
+	if (!(*data)->first_ph)
+	//null muss ja nicht gefreet werden?!
+		return (NULL);
 	current = (*data)->first_ph;
 	pthread_mutex_init(&current->right_fork, NULL);
-	while (i < (*data)->noph - 1)
+	while (i < (*data)->noph)
 	{
 		current->next = ft_calloc(1, sizeof(t_philly));
+		if (!current->next)
+		{
+			free_phillys(data, i);
+			return (NULL);
+		}	
 		current = current->next;
 		pthread_mutex_init(&current->right_fork, NULL);
 		i++;
@@ -80,73 +125,104 @@ t_philly *philly_cdll(t_data **data)
 
 int	create_phillys(t_data **data)
 {
+	printf("hallo\n");
 	t_philly	*head;
 	int			i;
 
 	i = 1;
 	head = philly_cdll(data);
-	//zeigt jetzt auf den ersten
+	if (head == NULL)
+		return (1);
+	printf("head address %p\n", head);
 	while (1)
 	{
 		head->id = i;
 		head->args = (*data);
-		head->left_fork = head->next->right_fork;
-		if (pthread_create(&current->thread, NULL, &routine, current->thread) != 0)
+		head->left_fork = &head->next->right_fork;
+		if (pthread_create(&head->thread, NULL, &routine, head) != 0)
 		{
-			perror("Failed to create thread");
+			free_phillys(data, (*data)->noph);
+			printf("failed to create thread\n");
 			return (1);
 		}
 		head = head->next;
 		if (head == (*data)->first_ph)
 			break ;
+		i++;
 	}
-	if (join_phillys((*data)))
+	if (join_phillys((data)))
 		return (1);
+	printf("head address end %p\n", head);
 	// pthread_mutex_destroy(&mutex_fork);
 	return (0);
 }
 
-//init phillys
-//cdll phillys
-//free phillys - 1)struct malloc 2)die ganzen values?
-
-int	clear_table(t_data **data)
-{
-	int	i;
-	t_philly *phil;
+// int	clear_table(t_data **data)
+// {
+// 	int	i;
+// 	t_philly *phil;
 	
-	i = (*data)->noph;
-	phil = (*data)->first_ph;
-	while (i > 0)
-	{
-		pthread_mutex_destroy(phil->left_fork);//while == forks
-		pthread_mutex_destroy(&phil->right_fork);//while == forks
-		phil = phil->next;
-	}
-	return (0);
-}
+// 	i = (*data)->noph;
+// 	phil = (*data)->first_ph;
+// 	while (i > 0)
+// 	{
+// 		pthread_mutex_destroy(phil->left_fork);//while == forks
+// 		pthread_mutex_destroy(&phil->right_fork);//while == forks
+// 		phil = phil->next;
+// 	}
+// 	return (0);
+// }
 
+void	print_phillys(t_data *data)
+{
+	int i;
+	t_philly *head;
+
+	i = 0;
+	head = data->first_ph; //current besser
+	while (i < data->noph) // i = 0 < number_philos statt while(1) && break
+	{
+		printf("id	%d\n", head->id);
+		printf("data pointer	%p\n", head->args);
+		printf("right fork	%p\n", &head->right_fork);
+		printf("left fork	%p\n", head->left_fork);
+		printf("own address	%p\n", head);
+		printf("next philo	%p\n", head->next);
+		if (head->next)
+			head = head->next;
+		// if (head == data->first_ph)
+		// 	break ;
+		i++;
+	}
+}
 int	main(int argc, char **argv)
 {
 	t_data	*data;
 	
 	if (input_check(argc, argv))
 		return (1);
-	//unvollständig
 	data = ft_calloc(1, sizeof(t_data));
-	//pointer auf data wird gemalloct
+	if (data == NULL)
+		return (1);
 	if (init_args(argv, data) == 1)
+	{
+		free(data);
+		//reicht doch oder? 
+		//weil die ganzen einzelnen werte in data habe ich ja nicht extra gemalloct!?
+		return (1);
+	}
+	if (create_phillys(&data))
 	{
 		free(data);
 		return (1);
 	}
-	//doesn't need to be protected ft_calloc handles
-	// set_fork_mutexes(data);
-	if (create_phillys(&data))
-		return (1);
-	if (clear_table(&data))
-		//whatever needs to be freed up til here
+	print_phillys(data);
+	free_phillys(&data, data->noph);
+	// if (clear_table(&data))
+	// 	//whatever needs to be freed up til here
+	print_phillys(data);
 	free(data);
+	// fscanf(stdin, "c");
 	return (0);
 }
 /*
