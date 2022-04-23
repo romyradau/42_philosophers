@@ -26,6 +26,7 @@
 typedef struct s_data
 {
 	long			noph;
+	time_t			start;
 	time_t			ttd;
 	time_t			tte;
 	time_t			tts;
@@ -40,13 +41,12 @@ typedef struct s_data
 
 typedef struct s_philly
 {
-	pthread_t		thread;//create_phillys
-	int				id;//check for single
-	pthread_mutex_t	right_fork;//check for single
-	pthread_mutex_t	*left_fork;//create_phillys, weil ich ersta lle philosophen habe
+	pthread_t		thread;
+	pthread_mutex_t	right_fork;
+	pthread_mutex_t	*left_fork;
+	struct s_philly	*next;
 	t_data			*args;
-	struct s_philly		*next;
-	// struct s_philly		*prev;
+	int				id;
 }	t_philly;
 
 
@@ -61,4 +61,5 @@ void	*ft_calloc(size_t count, size_t size);
 long	ft_atoi(const char *str);
 int		input_check(int x, char **argv);
 int		init_args(char **argv, t_data *data);
+time_t	get_time(void);
 #endif

@@ -46,30 +46,32 @@ void	*routine(void *philo)
 void	free_phillys(t_data **data, int i)
 {
 	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
-	// t_philly *current;
+	t_philly *current;
 	t_philly *next_ph;
 
-	// current = (*data)->first_ph;
+	current = (*data)->first_ph;
 	while (i > 1)
 	{
+		printf("current address %p\n", current);
 		printf("hallo\n");
-		if ((*data)->first_ph->next)
-			next_ph = (*data)->first_ph->next;
-		pthread_mutex_destroy(&(*data)->first_ph->right_fork);
-		free((*data)->first_ph);
-		// current = NULL;
-		printf("%p\n", (*data)->first_ph);
-		(*data)->first_ph = next_ph;
+		if (current->next)
+			next_ph = current->next;
+		pthread_mutex_destroy(&current->right_fork);
+		free(current);
+		// (*data)->first_ph = NULL;
+		printf("\nfirst ID %d\n", (*data)->first_ph->id);
+		printf("%p\n\n", (*data)->first_ph);
+		current = next_ph;
 		i--;
 	}
-	pthread_mutex_destroy(&(*data)->first_ph->right_fork);
-	free((*data)->first_ph);
-	// current = NULL;
+	pthread_mutex_destroy(&current->right_fork);
+	free(current);
+	// (*data)->first_ph = NULL;
 	printf("%p\n\n", (*data)->first_ph);
 	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
 
 }
-//freet nicht wies soll
+//freet nicht wies soll ?
 
 
 int	join_phillys(t_data **data)
@@ -83,7 +85,7 @@ int	join_phillys(t_data **data)
 		{
 			free_phillys(data, (*data)->noph);
 			printf("failed to join thread\n");
-			return (2);
+			return (1);
 		}
 			//welcher fehler soll hier kommen?
 		head = head->next;
@@ -125,7 +127,6 @@ t_philly *philly_cdll(t_data **data)
 
 int	create_phillys(t_data **data)
 {
-	printf("hallo\n");
 	t_philly	*head;
 	int			i;
 
@@ -133,9 +134,12 @@ int	create_phillys(t_data **data)
 	head = philly_cdll(data);
 	if (head == NULL)
 		return (1);
-	printf("head address %p\n", head);
+	(*data)->start = get_time();
+	//muss das vor dem thread_cerate passieren doer egal?
+	//bei dir davor weil du das data_init nicht lockst
 	while (1)
 	{
+		// head->name = "romy";
 		head->id = i;
 		head->args = (*data);
 		head->left_fork = &head->next->right_fork;
@@ -152,7 +156,6 @@ int	create_phillys(t_data **data)
 	}
 	if (join_phillys((data)))
 		return (1);
-	printf("head address end %p\n", head);
 	// pthread_mutex_destroy(&mutex_fork);
 	return (0);
 }
@@ -176,22 +179,20 @@ int	create_phillys(t_data **data)
 void	print_phillys(t_data *data)
 {
 	int i;
-	t_philly *head;
+	t_philly *current;
 
 	i = 0;
-	head = data->first_ph; //current besser
+	current = data->first_ph; //current besser
 	while (i < data->noph) // i = 0 < number_philos statt while(1) && break
 	{
-		printf("id	%d\n", head->id);
-		printf("data pointer	%p\n", head->args);
-		printf("right fork	%p\n", &head->right_fork);
-		printf("left fork	%p\n", head->left_fork);
-		printf("own address	%p\n", head);
-		printf("next philo	%p\n", head->next);
-		if (head->next)
-			head = head->next;
-		// if (head == data->first_ph)
-		// 	break ;
+		printf("id	%d\n", current->id);
+		printf("data pointer	%p\n", current->args);
+		printf("right fork	%p\n", &current->right_fork);
+		printf("left fork	%p\n", current->left_fork);
+		printf("own address	%p\n", current);
+		printf("next philo	%p\n", current->next);
+		if (current->next)
+			current = current->next;
 		i++;
 	}
 }
@@ -220,8 +221,8 @@ int	main(int argc, char **argv)
 	free_phillys(&data, data->noph);
 	// if (clear_table(&data))
 	// 	//whatever needs to be freed up til here
-	print_phillys(data);
 	free(data);
+	print_phillys(data);
 	// fscanf(stdin, "c");
 	return (0);
 }
