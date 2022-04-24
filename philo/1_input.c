@@ -32,12 +32,12 @@ int	max_min_check(t_data *data)
 
 int	init_args(char **argv, t_data *data)
 {	
-	data->noph = ft_atoi(argv[1]);
-	data->ttd = ft_atoi(argv[2]);
-	data->tte = ft_atoi(argv[3]);
-	data->tts = ft_atoi(argv[4]);
+	data->noph = ft_atol(argv[1]);
+	data->ttd = ft_atol(argv[2]);
+	data->tte = ft_atol(argv[3]);
+	data->tts = ft_atol(argv[4]);
 	if (argv[5])
-		data->notephme = ft_atoi(argv[5]);
+		data->notephme = ft_atol(argv[5]);
 	else
 		data->notephme = -1;
 	if (max_min_check(data) == 1)

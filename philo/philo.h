@@ -35,18 +35,19 @@ typedef struct s_data
 	// pthread_mutex_t	*forks;
 	pthread_mutex_t	dead_mx;
 	pthread_mutex_t print_mx;
-	//array mit anzahl von threads
+	pthread_t		your_mum;
 	struct s_philly		*first_ph;
 }	t_data;
 
 typedef struct s_philly
 {
+	t_data			*args;
+	int				id;
+	int				burgers;
 	pthread_t		thread;
 	pthread_mutex_t	right_fork;
 	pthread_mutex_t	*left_fork;
 	struct s_philly	*next;
-	t_data			*args;
-	int				id;
 }	t_philly;
 
 
@@ -58,7 +59,7 @@ typedef struct s_philly
 // }	t_mex;
 
 void	*ft_calloc(size_t count, size_t size);
-long	ft_atoi(const char *str);
+long	ft_atol(const char *str);
 int		input_check(int x, char **argv);
 int		init_args(char **argv, t_data *data);
 time_t	get_time(void);

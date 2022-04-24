@@ -18,11 +18,12 @@
 #include <limits.h>
 #include "philo.h"
 
-void	*routine(void *philo)
+void	*routine(void *input)
 {
 	t_philly *head;
 
-	head = (t_philly *)philo;
+	head = (t_philly *)input;
+	// (while !dead || notephme != full)
 	// int		meals;
 
 	// meals = data->notephme;
@@ -52,22 +53,19 @@ void	free_phillys(t_data **data, int i)
 	current = (*data)->first_ph;
 	while (i > 1)
 	{
-		printf("current address %p\n", current);
-		printf("hallo\n");
 		if (current->next)
 			next_ph = current->next;
 		pthread_mutex_destroy(&current->right_fork);
 		free(current);
-		// (*data)->first_ph = NULL;
-		printf("\nfirst ID %d\n", (*data)->first_ph->id);
-		printf("%p\n\n", (*data)->first_ph);
+		// current = NULL;
 		current = next_ph;
 		i--;
 	}
 	pthread_mutex_destroy(&current->right_fork);
 	free(current);
-	// (*data)->first_ph = NULL;
-	printf("%p\n\n", (*data)->first_ph);
+	current = NULL;
+	free((*data));
+	data = NULL;
 	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
 
 }
@@ -92,6 +90,7 @@ int	join_phillys(t_data **data)
 		if (head == (*data)->first_ph)
 			break ;
 	}
+	//if (pthread_join((*data)->your_mum, NULL) != 0)
 	return (0);
 }
 
@@ -143,7 +142,7 @@ int	create_phillys(t_data **data)
 		head->id = i;
 		head->args = (*data);
 		head->left_fork = &head->next->right_fork;
-		if (pthread_create(&head->thread, NULL, &routine, head) != 0)
+		if (pthread_create(&head->thread, NULL, routine, head) != 0)
 		{
 			free_phillys(data, (*data)->noph);
 			printf("failed to create thread\n");
@@ -154,6 +153,9 @@ int	create_phillys(t_data **data)
 			break ;
 		i++;
 	}
+	//eine variante hier den waiter_thread einfugen mit anderer routine
+	//und dann auch beim joinen
+	//if (pthread_create(data->your_mum, NULL, kills_you, data) != 0);
 	if (join_phillys((data)))
 		return (1);
 	// pthread_mutex_destroy(&mutex_fork);
@@ -207,23 +209,24 @@ int	main(int argc, char **argv)
 		return (1);
 	if (init_args(argv, data) == 1)
 	{
-		free(data);
+		// free(data);
 		//reicht doch oder? 
 		//weil die ganzen einzelnen werte in data habe ich ja nicht extra gemalloct!?
 		return (1);
 	}
 	if (create_phillys(&data))
 	{
-		free(data);
+		// free(data);
 		return (1);
 	}
 	print_phillys(data);
 	free_phillys(&data, data->noph);
 	// if (clear_table(&data))
 	// 	//whatever needs to be freed up til here
-	free(data);
-	print_phillys(data);
-	// fscanf(stdin, "c");
+	// free(data);
+	// data = NULL;
+	// print_phillys(data);
+	fscanf(stdin, "c");
 	return (0);
 }
 /*
