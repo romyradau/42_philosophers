@@ -18,27 +18,104 @@
 #include <limits.h>
 #include "philo.h"
 
+void	print_message(t_philly *philly, t_data **data, const char *message)
+{
+	pthread_mutex_lock(&(*data)->print_mx);
+	// printf("%ld	%d	%s\n", )
+	// printf("start	%lu	\n", (*data)->start);
+	printf("%lu %d %s\n", get_time() - (*data)->start, philly->id, message);
+	pthread_mutex_unlock(&(*data)->print_mx);
+
+}
+
+void	sleep_ms(time_t val)
+{
+	time_t	time;
+
+	time = get_time();
+	while (1)
+	{
+		if (time + val <= get_time())
+			break ;
+		// time_to_die(philo);
+		usleep(100);
+	}
+}
+
+int	your_mum_calls(t_philly *philly, t_data *data)
+{
+	pthread_mutex_lock(&data->dead_mx);
+	// printf("id: %d time %ld\n",philly->id, get_time());
+	// printf("id: %d last burger: %ld\n",philly->id, philly->last_burger);
+	// printf("id: %d time - burger: %ld\n",philly->id, data->start - philly->last_burger);
+	if (philly->last_burger - data->start > data->ttd)
+	{
+		print_message(philly, &philly->args, "died");
+		philly->dead = true;
+		pthread_mutex_unlock(&data->dead_mx);
+		return (1);
+	}
+	pthread_mutex_unlock(&data->dead_mx);
+	return (0);
+
+}
+//figure out whats wrong with your death timing
+//but very well doen today <3
+
+int	eat(t_philly *philly, t_data *data)
+{
+	pthread_mutex_lock(&philly->right_fork);
+	print_message(philly, &data, "has taken a fork");
+	pthread_mutex_lock(philly->left_fork);
+	print_message(philly, &data, "has taken a second fork");
+	philly->burgers++;
+	sleep_ms(data->tte);
+	print_message(philly, &data, "is eating burgers");
+	philly->last_burger = get_time();
+	pthread_mutex_unlock(&philly->right_fork);
+	pthread_mutex_unlock(philly->left_fork);
+	if (your_mum_calls(philly, data))
+		return (1);
+	return (0);
+}
+
+
+void	nap(t_philly *philly, t_data *data)
+{
+	print_message(philly, &data, "is sleeping");
+	sleep_ms(data->tts);
+}
+
+void	think(t_philly *philly, t_data *data)
+{
+	print_message(philly, &data, "is thinking");
+}
+
+
+
 void	*routine(void *input)
 {
-	t_philly *head;
+	t_philly *philly;
+	int		meals;
 
-	head = (t_philly *)input;
-	// (while !dead || notephme != full)
-	// int		meals;
-
-	// meals = data->notephme;
-	// if (data->notephme > 0)
-	// {
-	// 	while (meals > 0)
-	// 	{
-	// 		pthread_mutex_lock(head->left_fork);
-	// 		pthread_mutex_lock(&head->right_fork);
-	// 		//this function waits and locks and does everything
-	// 		meals--;
-	// 		pthread_mutex_unlock(head->left_fork);
-	// 		pthread_mutex_unlock(&head->right_fork);
-	// 	}
-	// }
+	philly = (t_philly *)input;
+	meals = philly->args->notephme;
+	if (philly->id % 2)
+		usleep(100);
+	//ist das nicht irgendwie hin und her
+	//man will dass alles gleichzeitig lauft und dann pausiert amna ber
+	//nimmt das nicht eigentlich die funktion von threads weg?
+	while (philly->burgers < meals || !philly->dead)
+	{
+		if (philly->burgers == meals)
+			break;
+		if (your_mum_calls(philly, philly->args))
+			break ;
+		if (eat(philly, philly->args))
+			break ;
+		nap(philly, philly->args);
+		think(philly, philly->args);
+	}
 	return (NULL);
 }
 //eat
@@ -82,6 +159,7 @@ int	join_phillys(t_data **data)
 		if (pthread_join(head->thread, NULL) != 0)
 		{
 			free_phillys(data, (*data)->noph);
+			//maybe lock print_mx
 			printf("failed to join thread\n");
 			return (1);
 		}
@@ -117,6 +195,7 @@ t_philly *philly_cdll(t_data **data)
 		}	
 		current = current->next;
 		pthread_mutex_init(&current->right_fork, NULL);
+		//muss theoretischc protected werden
 		i++;
 	}
 	current->next = (*data)->first_ph;
@@ -133,18 +212,26 @@ int	create_phillys(t_data **data)
 	head = philly_cdll(data);
 	if (head == NULL)
 		return (1);
+	pthread_mutex_init(&(*data)->print_mx, NULL);
+		//muss theoretischc protected werden
+	pthread_mutex_init(&(*data)->dead_mx, NULL);
+		//muss theoretischc protected werden
 	(*data)->start = get_time();
 	//muss das vor dem thread_cerate passieren doer egal?
 	//bei dir davor weil du das data_init nicht lockst
 	while (1)
 	{
 		// head->name = "romy";
+		head->dead = false;
 		head->id = i;
+		head->burgers = 0;
 		head->args = (*data);
 		head->left_fork = &head->next->right_fork;
+		head->last_burger = get_time();
 		if (pthread_create(&head->thread, NULL, routine, head) != 0)
 		{
 			free_phillys(data, (*data)->noph);
+			//maybe print_mx
 			printf("failed to create thread\n");
 			return (1);
 		}
@@ -219,14 +306,14 @@ int	main(int argc, char **argv)
 		// free(data);
 		return (1);
 	}
-	print_phillys(data);
+	// print_phillys(data);
 	free_phillys(&data, data->noph);
 	// if (clear_table(&data))
 	// 	//whatever needs to be freed up til here
 	// free(data);
 	// data = NULL;
 	// print_phillys(data);
-	fscanf(stdin, "c");
+	// fscanf(stdin, "c");
 	return (0);
 }
 /*

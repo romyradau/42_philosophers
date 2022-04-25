@@ -21,6 +21,7 @@
 # include <limits.h>
 # include <stdio.h>
 # include <string.h>
+# include <stdbool.h>
 # include "philo.h"
 
 typedef struct s_data
@@ -31,11 +32,8 @@ typedef struct s_data
 	time_t			tte;
 	time_t			tts;
 	long			notephme;
-	int				threads_num;
-	// pthread_mutex_t	*forks;
 	pthread_mutex_t	dead_mx;
 	pthread_mutex_t print_mx;
-	pthread_t		your_mum;
 	struct s_philly		*first_ph;
 }	t_data;
 
@@ -44,9 +42,12 @@ typedef struct s_philly
 	t_data			*args;
 	int				id;
 	int				burgers;
+	time_t			last_burger;
 	pthread_t		thread;
 	pthread_mutex_t	right_fork;
 	pthread_mutex_t	*left_fork;
+	bool			dead;
+	//muss der jetzt hier hin oder in data?
 	struct s_philly	*next;
 }	t_philly;
 
