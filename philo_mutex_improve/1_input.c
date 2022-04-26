@@ -65,7 +65,7 @@ int	input_check(int x, char **argv)
 		{
 			if (argv[i][j] < 48 || argv[i][j] > 57 || argv[i][0] == '0')
 			{
-				printf("non numeric or no argument\n");
+				printf("non numeric argument\n");
 				return (1);
 			}
 			j++;

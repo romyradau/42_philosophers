@@ -47,22 +47,23 @@ typedef struct s_philly
 	pthread_t		thread;
 	pthread_mutex_t	right_fork;
 	pthread_mutex_t	*left_fork;
+	//muss der jetzt hier hin oder in data?
 	struct s_philly	*next;
 }	t_philly;
 
-int		input_check(int x, char **argv);
-void	*ft_calloc(size_t count, size_t size);
-int		init_args(char **argv, t_data *data);
-long	ft_atol(const char *str);
-time_t	get_time(void);
 
-int		create_phillys(t_data **data);
-void	*routine(void *input);
-int		sleep_until(time_t time, t_philly *philly, t_data *data);
-int		your_mum_calls(t_philly *philly, t_data *data);
-int		print_message(t_philly *philly, t_data **data, const char *message);
-int		ft_strncmp(const char *s1, const char *s2, size_t n);
-int		clear_table(t_data **data);
-void	free_phillys(t_data **data, int i);
+// typedef struct s_mutex
+// {
+// 	pthread_mutex_t	*left_fork;
+// 	pthread_mutex_t	*right_fork;
+// 	pthread_mutex_t	dead;
+// }	t_mex;
+
+void	*ft_calloc(size_t count, size_t size);
+long	ft_atol(const char *str);
+int		input_check(int x, char **argv);
+int		init_args(char **argv, t_data *data);
+time_t	get_time(void);
+int	ft_strncmp(const char *s1, const char *s2, size_t n);
 
 #endif

@@ -12,21 +12,6 @@
 
 #include "philo.h"
 
-int	sleep_until(time_t time, t_philly *philly, t_data *data)
-{
-	time_t	snapshot;
-
-	snapshot = get_time();
-	while (1)
-	{
-		if (snapshot + time <= get_time())
-			break ;
-		if (your_mum_calls(philly, data))
-			return (1);
-		usleep(100);
-	}
-	return (0);
-}
 
 time_t	get_time(void)
 {
@@ -103,3 +88,15 @@ void	*ft_calloc(size_t count, size_t size)
 	}
 	return (ptr);
 }
+
+// void	ft_bzero(void *s, size_t n)
+// {
+// 	size_t	counter;
+
+// 	counter = 0;
+// 	while (counter < n)
+// 	{
+// 		((char *)s)[counter] = '\0';
+// 		counter++;
+// 	}
+// }
