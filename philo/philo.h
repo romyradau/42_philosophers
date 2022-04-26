@@ -32,6 +32,7 @@ typedef struct s_data
 	time_t			tte;
 	time_t			tts;
 	long			notephme;
+	bool			dead;
 	pthread_mutex_t	dead_mx;
 	pthread_mutex_t print_mx;
 	struct s_philly		*first_ph;
@@ -46,7 +47,6 @@ typedef struct s_philly
 	pthread_t		thread;
 	pthread_mutex_t	right_fork;
 	pthread_mutex_t	*left_fork;
-	bool			dead;
 	//muss der jetzt hier hin oder in data?
 	struct s_philly	*next;
 }	t_philly;
@@ -64,4 +64,6 @@ long	ft_atol(const char *str);
 int		input_check(int x, char **argv);
 int		init_args(char **argv, t_data *data);
 time_t	get_time(void);
+int	ft_strncmp(const char *s1, const char *s2, size_t n);
+
 #endif
