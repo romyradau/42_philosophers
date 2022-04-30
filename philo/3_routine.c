@@ -19,20 +19,20 @@ int	ready_to_eat(t_philly *philly, t_data *data, char c)
 	if (c == 'r')
 	{
 		pthread_mutex_lock(&philly->right_fork);//impro variante mit extra lock bool
-		data->right = true;
 		if (your_mum_calls(philly, data))
 		{
 			pthread_mutex_unlock(&philly->right_fork);
 			// pthread_mutex_unlock(&data->print_mx);
 			return (1);
 		}
-		// pthread_mutex_unlock(&philly->right_fork);//impro variante mit extra lock bool
+		pthread_mutex_unlock(&philly->right_fork);//impro variante mit extra lock bool
 		return (0);
 	}
+	//so wird right jetzt unlocked, wenn die gabel genommen wurde
+	//man braucht keine extra fuction hier
 	else if (c == 'l')
 	{
 		pthread_mutex_lock(philly->left_fork);//impro variante mit extra lock bool
-		data->left = true;
 		if (your_mum_calls(philly, data))
 		{
 			pthread_mutex_unlock(&philly->right_fork);
@@ -62,8 +62,10 @@ int	eat(t_philly *philly, t_data *data)
 			break ;
 		}	
 		pthread_mutex_unlock(&philly->right_fork);
+		//extra mutex um das zu checken
 		if (ready_to_eat(philly, data, 'r'))
 			return (1);
+		//fuck muss jetzt hier right unlocked werden oder nicht, wenn mand ie gabel nehmen konnte?
 	}
 	// pthread_mutex_lock(&philly->right_fork);//impro variante mit extra lock bool
 	// if (your_mum_calls(philly, data))
@@ -104,6 +106,7 @@ int	eat(t_philly *philly, t_data *data)
 		3. sleep until time to die
 		4. dead.
 	*/
+//nach dem essen mussen die right & left weider freigegeben werden!
 
 	// check if we died
 
