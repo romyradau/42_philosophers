@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 15:06:03 by rschleic          #+#    #+#             */
-/*   Updated: 2022/04/03 17:53:23 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/04/30 14:10:45 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ typedef struct s_data
 	time_t			tts;
 	long			notephme;
 	bool			dead;
+	bool			right;
+	bool			left;
 	pthread_mutex_t	dead_mx;
 	pthread_mutex_t print_mx;
 	struct s_philly		*first_ph;

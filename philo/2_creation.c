@@ -118,6 +118,8 @@ int	create_phillys(t_data **data)
 	//muss das vor dem thread_cerate passieren doer egal?
 	//bei dir davor weil du das data_init nicht lockst
 	(*data)->dead = false;
+	(*data)->right = true;
+	(*data)->left = true;
 	while (1)
 	{
 		// head->name = "romy";

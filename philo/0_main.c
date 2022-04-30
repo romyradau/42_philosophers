@@ -83,7 +83,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	// print_phillys(data);
-	if (clear_table(&data))
+	// if (clear_table(&data))
 	free_phillys(&data, data->noph);
 	// fscanf(stdin, "c");
 	return (0);
