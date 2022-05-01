@@ -18,6 +18,9 @@ int	ready_to_eat(t_philly *philly, t_data *data, char c)
 {
 	if (c == 'r')
 	{
+		//gibts hier nen problem mit 
+		//dass der andere nie deie gabel nehmen kann
+		//weil der mutex gleich hier verwednet wird?
 		pthread_mutex_lock(&philly->right_fork);//impro variante mit extra lock bool
 		if (your_mum_calls(philly, data))
 		{
@@ -35,11 +38,12 @@ int	ready_to_eat(t_philly *philly, t_data *data, char c)
 		pthread_mutex_lock(philly->left_fork);//impro variante mit extra lock bool
 		if (your_mum_calls(philly, data))
 		{
-			pthread_mutex_unlock(&philly->right_fork);
+			// pthread_mutex_unlock(&philly->right_fork);
 			pthread_mutex_unlock(philly->left_fork);
 			// pthread_mutex_unlock(&data->print_mx);
 			return (1);
 		}
+		pthread_mutex_unlock(philly->left_fork);
 	}
 	return (0);
 }
@@ -98,29 +102,45 @@ int	eat(t_philly *philly, t_data *data)
 		if (ready_to_eat(philly, data, 'l'))
 			return (1);
 	}
+	//ab dem moment ist nichts gelockt
+	//das ist doch ein problem??
+	//wenn ich hier jetzt einfach den dead mutex drum amche
+	//gibt das probleme ? weil z.b. jmd anderes den benutzt?
+	//ich check das noch nciht
+	// pthread_mutex_lock(&data->dead_mx);
+	if (left_fork_taken && right_fork_taken)
+	{
+		left_fork_taken = false;
+		data->left = true;
+		right_fork_taken = false;
+		data->right = true; // taking the fork -> right fork is not available anymore so we set it to false
+		//macht das n unetrschied wo die neue zeit genommen wird?
+		philly->burgers++;
+		print_message(philly, &data, "is eating burgers");
+		philly->last_burger = get_time();
+		// pthread_mutex_unlock(&data->dead_mx);
+		if (add_time(data->tte, philly, data))
+		{	
+			// pthread_mutex_unlock(&philly->right_fork);
+			// pthread_mutex_unlock(philly->left_fork);
+			//wurden diese beiden zeilen ehen wenn ich beim fork nehmen klappt nicht unlocken wurde?
+			return (1);
+		}
+
+	}
 	// we have checked for both forks
 	// if we took both forks -> eat -> put down the forks -> return from this subroutine/function
 	/* eat:
 		1. set ate timestamp to current time
-		2. check if we would die during eating (time to eat > time to die)
+		//2. check if we would die during eating (time to eat > time to die)
 		3. sleep until time to die
-		4. dead.
+		4. dead?
 	*/
-//nach dem essen mussen die right & left weider freigegeben werden!
+//nach dem essen mussen die right & left weider freigegeben werden!!!!
 
 	// check if we died
 
-	philly->burgers++;
-	philly->last_burger = get_time();
-	print_message(philly, &data, "is eating burgers");
-	if (sleep_until(data->tte, philly, data))
-	{	
-		pthread_mutex_unlock(&philly->right_fork);
-		pthread_mutex_unlock(philly->left_fork);
-		return (1);
-	}
-	pthread_mutex_unlock(&philly->right_fork);
-	pthread_mutex_unlock(philly->left_fork);
+
 	if (your_mum_calls(philly, data))
 	{
 		return (1);
@@ -137,7 +157,7 @@ int	nap(t_philly *philly, t_data *data)
 		time to sleep > time to die -> sleep for time to die -> dead
 	*/
 	print_message(philly, &data, "is sleeping");
-	if (sleep_until(data->tts, philly, data))
+	if (add_time(data->tts, philly, data))
 		return (1);
 	return (0);
 }
@@ -155,7 +175,7 @@ void	*routine(void *input)
 	philly = (t_philly *)input;
 	meals = philly->args->notephme;
 	if (philly->id % 2)
-		sleep_until(100, philly, philly->args);//sollte ich hier auch sleep_ms nehmen??
+		add_time(100, philly, philly->args);//sollte ich hier auch sleep_ms nehmen??
 	//ist das nicht irgendwie hin und her
 	//man will dass alles gleichzeitig lauft und dann pausiert amna ber
 	//nimmt das nicht eigentlich die funktion von threads weg?

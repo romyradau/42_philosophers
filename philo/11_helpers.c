@@ -6,13 +6,13 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 16:10:27 by rschleic          #+#    #+#             */
-/*   Updated: 2022/04/03 19:38:52 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/01 18:55:54 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	sleep_until(time_t time, t_philly *philly, t_data *data)
+int	add_time(time_t time, t_philly *philly, t_data *data)
 {
 	time_t	snapshot;
 

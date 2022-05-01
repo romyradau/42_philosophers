@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 15:06:03 by rschleic          #+#    #+#             */
-/*   Updated: 2022/04/30 14:10:45 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/01 18:56:05 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ time_t	get_time(void);
 
 int		create_phillys(t_data **data);
 void	*routine(void *input);
-int		sleep_until(time_t time, t_philly *philly, t_data *data);
+int		add_time(time_t time, t_philly *philly, t_data *data);
 int		your_mum_calls(t_philly *philly, t_data *data);
 int		print_message(t_philly *philly, t_data **data, const char *message);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
