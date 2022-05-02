@@ -20,9 +20,35 @@ void	free_phillys(t_data **data, int i)
 	}
 	pthread_mutex_destroy(&current->right_fork);
 	free(current);
-	current = NULL;
+	/*
+		original -> {
+			free(pointer);
+			// pointer = NULL;
+		}
+		free(original);
+		original = NULL;
+	*/
+	// current = NULL;
 	free((*data));
-	data = NULL;
+	/*
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+		........
+	*/
+	*data = NULL;
 	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
 
 }
@@ -118,8 +144,8 @@ int	create_phillys(t_data **data)
 	//muss das vor dem thread_cerate passieren doer egal?
 	//bei dir davor weil du das data_init nicht lockst
 	(*data)->dead = false;
-	(*data)->right = true;
-	(*data)->left = true;
+	// (*data)->right = true;
+	// (*data)->left = true;
 	while (1)
 	{
 		// head->name = "romy";
@@ -128,7 +154,9 @@ int	create_phillys(t_data **data)
 		head->args = (*data);
 		head->left_fork = &head->next->right_fork;
 		head->last_burger = get_time();
-		if (pthread_create(&head->thread, NULL, routine, head) != 0)
+		head->right = true;
+		head->left = &head->next->right;
+		if (pthread_create(&head->thread, NULL, &routine, head) != 0)
 		{
 			free_phillys(data, (*data)->noph);
 			//maybe print_mx

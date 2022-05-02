@@ -2,12 +2,15 @@
 
 int	your_mum_calls(t_philly *philly, t_data *data)
 {
+	//hier dead_mx locken, dann brauchst du keien ready to eat!
+	// pthread_mutex_lock(&data->dead_mx);
+	//vlt muss man das nicht locken, weile s philly spezifisch ist
+	//und ttd nciht verdnert wird
 	if (get_time() - philly->last_burger >= data->ttd)
 	{
-		// pthread_mutex_lock(&data->dead_mx);
+		// pthread_mutex_unlock(&data->dead_mx);
 		print_message(philly, &philly->args, "died");
 		// data->dead = true;
-		// pthread_mutex_unlock(&data->dead_mx);
 		return (1);
 	}
 	// pthread_mutex_unlock(&data->dead_mx);
@@ -52,22 +55,25 @@ int	eat(t_philly *philly, t_data *data)
 {
 	//die sterben beim warten auf die erste gabel
 	//die warten so lange 
-	bool left_fork_taken = false;
-	bool right_fork_taken = false;
+	// bool left_fork_taken;
+	// bool right_fork_taken; 
+	// left_fork_taken = false;
+	// right_fork_taken = false;
 	while (1) // find out if right fork is available, if it is -> take it
 	{
 		pthread_mutex_lock(&philly->right_fork); // lock boolean for the right fork check
-		if (data->right) // actual check for the right fork
+		if (philly->right) // actual check for the right fork
 		{
+			philly->right = false; // taking the fork -> right fork is not available anymore so we set it to false
 			print_message(philly, &data, "has taken a fork");
-			data->right = false; // taking the fork -> right fork is not available anymore so we set it to false
-			right_fork_taken = true;
+			// right_fork_taken = true;
 			pthread_mutex_unlock(&philly->right_fork); // unlock boolean for the right fork check, now other threads will see the fork as not available
 			break ;
 		}	
 		pthread_mutex_unlock(&philly->right_fork);
+		//check if I died
 		//extra mutex um das zu checken
-		if (ready_to_eat(philly, data, 'r'))
+		if (your_mum_calls(philly, data))
 			return (1);
 		//fuck muss jetzt hier right unlocked werden oder nicht, wenn mand ie gabel nehmen konnte?
 	}
@@ -90,16 +96,16 @@ int	eat(t_philly *philly, t_data *data)
 	while (1) // check if left fork is available, if it is -> take it
 	{
 		pthread_mutex_lock(philly->left_fork);
-		if (data->left)
+		if (*(philly->left))
 		{
 			print_message(philly, &data, "has taken a second fork");
-			data->left = false;
-			left_fork_taken = true;
+			*(philly->left) = false;
+			// left_fork_taken = true;
 			pthread_mutex_unlock(philly->left_fork);
 			break ;
 		}	
 		pthread_mutex_unlock(philly->left_fork);
-		if (ready_to_eat(philly, data, 'l'))
+		if (your_mum_calls(philly, data))
 			return (1);
 	}
 	//ab dem moment ist nichts gelockt
@@ -108,26 +114,43 @@ int	eat(t_philly *philly, t_data *data)
 	//gibt das probleme ? weil z.b. jmd anderes den benutzt?
 	//ich check das noch nciht
 	// pthread_mutex_lock(&data->dead_mx);
-	if (left_fork_taken && right_fork_taken)
+	// if (left_fork_taken && right_fork_taken)
+	// {
+	// 	// pthread_mutex_lock(&data->dead_mx);
+	// 	// if (philly->last_burger + data->tte > data->ttd)
+	// 	// {
+	// 	// 	pthread_mutex_unlock(&data->dead_mx);
+	// 	// 	your_mum_calls(philly, data);
+	// 	// 	return (1);
+	// 	// }
+	// 	//TODO:bevor die zeit drauf gerechent wird uss geschaut werden ob man dabei sterben würde
+	// 	left_fork_taken = false;
+	// 	right_fork_taken = false;
+		//jede variable muss immer mit dem gleichen mutex gelockt werden!
+		//also links mit links und rechts mit rechts
+		//TODO: darf das erst anch dem incrementen und timen unlocked werden?
+	philly->burgers++;
+	philly->last_burger = get_time();
+	if (your_mum_calls(philly, data))
 	{
-		left_fork_taken = false;
-		data->left = true;
-		right_fork_taken = false;
-		data->right = true; // taking the fork -> right fork is not available anymore so we set it to false
-		//macht das n unetrschied wo die neue zeit genommen wird?
-		philly->burgers++;
-		print_message(philly, &data, "is eating burgers");
-		philly->last_burger = get_time();
-		// pthread_mutex_unlock(&data->dead_mx);
-		if (add_time(data->tte, philly, data))
-		{	
-			// pthread_mutex_unlock(&philly->right_fork);
-			// pthread_mutex_unlock(philly->left_fork);
-			//wurden diese beiden zeilen ehen wenn ich beim fork nehmen klappt nicht unlocken wurde?
-			return (1);
-		}
-
+		return (1);
 	}
+	print_message(philly, &data, "is eating burgers");
+	// pthread_mutex_unlock(&data->dead_mx);
+	if (add_time(data->tte, philly, data))
+	{	
+		// pthread_mutex_unlock(&philly->right_fork);
+		// pthread_mutex_unlock(philly->left_fork);
+		//wurden diese beiden zeilen ehen wenn ich beim fork nehmen klappt nicht unlocken wurde?
+		return (1);
+	}
+	pthread_mutex_lock(philly->left_fork);//impro variante mit extra lock bool
+	*(philly->left) = true;
+	pthread_mutex_unlock(philly->left_fork);//impro variante mit extra lock bool
+	pthread_mutex_lock(&philly->right_fork);//impro variante mit extra lock bool
+	philly->right = true; // taking the fork -> right fork is not available anymore so we set it to false
+	pthread_mutex_unlock(&philly->right_fork);//impro variante mit extra lock bool
+	// }
 	// we have checked for both forks
 	// if we took both forks -> eat -> put down the forks -> return from this subroutine/function
 	/* eat:
@@ -139,8 +162,6 @@ int	eat(t_philly *philly, t_data *data)
 //nach dem essen mussen die right & left weider freigegeben werden!!!!
 
 	// check if we died
-
-
 	if (your_mum_calls(philly, data))
 	{
 		return (1);

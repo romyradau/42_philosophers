@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 14:30:20 by rschleic          #+#    #+#             */
-/*   Updated: 2022/04/03 17:57:45 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/02 14:50:27 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ void	print_phillys(t_data *data)
 	int i;
 	t_philly *current;
 
+	if (data == NULL)
+		return ;
 	i = 0;
 	current = data->first_ph; //current besser
 	while (i < data->noph) // i = 0 < number_philos statt while(1) && break
@@ -66,26 +68,35 @@ int	main(int argc, char **argv)
 	t_data	*data;
 	
 	if (input_check(argc, argv))
+	{
+		system("leaks philo");
 		return (1);
+	}
 	data = ft_calloc(1, sizeof(t_data));
 	if (data == NULL)
+	{
+		system("leaks philo");
 		return (1);
+	}
 	if (init_args(argv, data) == 1)
 	{
 		// free(data);
 		//reicht doch oder? 
 		//weil die ganzen einzelnen werte in data habe ich ja nicht extra gemalloct!?
+		system("leaks philo");
 		return (1);
 	}
 	if (create_phillys(&data))
 	{
-		// free(data);
+		system("leaks philo");
 		return (1);
 	}
-	// print_phillys(data);
+	print_phillys(data);
 	// if (clear_table(&data))
 	free_phillys(&data, data->noph);
+	print_phillys(data);
 	// fscanf(stdin, "c");
+	system("leaks philo");
 	return (0);
 }
 

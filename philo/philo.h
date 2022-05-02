@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 15:06:03 by rschleic          #+#    #+#             */
-/*   Updated: 2022/05/01 18:56:05 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/02 13:35:58 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@ typedef struct s_data
 	time_t			tts;
 	long			notephme;
 	bool			dead;
-	bool			right;
-	bool			left;
 	pthread_mutex_t	dead_mx;
 	pthread_mutex_t print_mx;
 	struct s_philly		*first_ph;
@@ -47,6 +45,8 @@ typedef struct s_philly
 	int				burgers;
 	time_t			last_burger;
 	pthread_t		thread;
+	bool			right;
+	bool			*left;
 	pthread_mutex_t	right_fork;
 	pthread_mutex_t	*left_fork;
 	struct s_philly	*next;
