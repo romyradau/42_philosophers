@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 15:06:03 by rschleic          #+#    #+#             */
-/*   Updated: 2022/05/02 13:35:58 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/03 20:45:16 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,10 @@ typedef struct s_data
 	time_t			tts;
 	long			notephme;
 	bool			dead;
+	bool			created_all;
 	pthread_mutex_t	dead_mx;
-	pthread_mutex_t print_mx;
-	struct s_philly		*first_ph;
+	pthread_mutex_t	print_mx;
+	struct s_philly	*first_ph;
 }	t_data;
 
 typedef struct s_philly
@@ -60,11 +61,13 @@ time_t	get_time(void);
 
 int		create_phillys(t_data **data);
 void	*routine(void *input);
+int		eat(t_philly *philly, t_data *data);
+int		nap(t_philly *philly, t_data *data);
+void	think(t_philly *philly, t_data *data);
 int		add_time(time_t time, t_philly *philly, t_data *data);
 int		your_mum_calls(t_philly *philly, t_data *data);
 int		print_message(t_philly *philly, t_data **data, const char *message);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-int		clear_table(t_data **data);
 void	free_phillys(t_data **data, int i);
 
 #endif

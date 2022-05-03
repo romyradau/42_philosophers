@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 16:10:27 by rschleic          #+#    #+#             */
-/*   Updated: 2022/05/02 14:23:58 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/03 19:37:52 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	add_time(time_t time, t_philly *philly, t_data *data)
 			break ;
 		if (your_mum_calls(philly, data))
 			return (1);
-		usleep(100);
+		usleep(1000);
 	}
 	return (0);
 }
@@ -82,7 +82,6 @@ long	ft_atol(const char *str)
 	}
 	return (sign * output);
 }
-
 
 void	*ft_calloc(size_t count, size_t size)
 {

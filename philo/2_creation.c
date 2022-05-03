@@ -1,77 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   2_creation.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/03 19:54:40 by rschleic          #+#    #+#             */
+/*   Updated: 2022/05/03 20:15:10 by rschleic         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
-
-
-void	free_phillys(t_data **data, int i)
-{
-	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
-	t_philly *current;
-	t_philly *next_ph;
-
-	current = (*data)->first_ph;
-	while (i > 1)
-	{
-		if (current->next)
-			next_ph = current->next;
-		pthread_mutex_destroy(&current->right_fork);
-		free(current);
-		// current = NULL;
-		current = next_ph;
-		i--;
-	}
-	pthread_mutex_destroy(&current->right_fork);
-	free(current);
-	/*
-		original -> {
-			free(pointer);
-			// pointer = NULL;
-		}
-		free(original);
-		original = NULL;
-	*/
-	// current = NULL;
-	free((*data));
-	/*
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-		........
-	*/
-	*data = NULL;
-	printf("\n\nFREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n\n");
-
-}
-//freet nicht wies soll - oder doch?
-//wie kann ich das richtig sichtbar machen ?
-
-int	clear_table(t_data **data)
-{
-	int	i;
-	t_philly *phil;
-	
-	i = (*data)->noph;
-	phil = (*data)->first_ph;
-	while (1)
-	{
-		pthread_mutex_destroy(&phil->right_fork);
-		//muss auch protectd werden
-		phil = phil->next;
-		if (phil->next == (*data)->first_ph)
-			break ;
-	}
-	return (0);
-}
 
 int	join_phillys(t_data **data)
 {
@@ -83,72 +22,68 @@ int	join_phillys(t_data **data)
 		if (pthread_join(head->thread, NULL) != 0)
 		{
 			free_phillys(data, (*data)->noph);
-			//maybe lock print_mx
 			printf("failed to join thread\n");
 			return (1);
 		}
-			//welcher fehler soll hier kommen?
 		head = head->next;
 		if (head == (*data)->first_ph)
 			break ;
 	}
-	//if (pthread_join((*data)->your_mum, NULL) != 0)
 	return (0);
 }
 
-
-t_philly *philly_cdll(t_data **data)
+int	new_philly(t_data **data, t_philly	**current, int i)
 {
-	int i;
-	t_philly *current;
+	while (i < (*data)->noph)
+	{
+		(*current)->next = ft_calloc(1, sizeof(t_philly));
+		if (!(*current)->next)
+		{
+			free_phillys(data, i);
+			return (1);
+		}	
+		(*current) = (*current)->next;
+		if (pthread_mutex_init(&(*current)->right_fork, NULL) != 0)
+		{
+			free((*current));
+			free_phillys(data, i);
+			return (1);
+		}
+		i++;
+	}
+	return (0);
+}
+
+t_philly	*philly_cdll(t_data **data)
+{
+	int			i;
+	t_philly	*current;
 
 	i = 1;
 	(*data)->first_ph = ft_calloc(1, sizeof(t_philly));
 	if (!(*data)->first_ph)
-	//null muss ja nicht gefreet werden?!
 		return (NULL);
 	current = (*data)->first_ph;
-	pthread_mutex_init(&current->right_fork, NULL);
-	while (i < (*data)->noph)
+	if (pthread_mutex_init(&current->right_fork, NULL) != 0)
 	{
-		current->next = ft_calloc(1, sizeof(t_philly));
-		if (!current->next)
-		{
-			free_phillys(data, i);
-			return (NULL);
-		}	
-		current = current->next;
-		pthread_mutex_init(&current->right_fork, NULL);
-		//muss theoretischc protected werden
-		i++;
+		free ((*data)->first_ph);
+		return (NULL);
 	}
+	if (new_philly(data, &current, i))
+		return (NULL);
 	current->next = (*data)->first_ph;
 	return ((*data)->first_ph);
 }
 
-
-int	create_phillys(t_data **data)
+int	init_philly(t_data **data)
 {
-	t_philly	*head;
+	t_philly	*head;	
 	int			i;
 
 	i = 1;
-	head = philly_cdll(data);
-	if (head == NULL)
-		return (1);
-	pthread_mutex_init(&(*data)->print_mx, NULL);
-		//muss theoretischc protected werden
-	pthread_mutex_init(&(*data)->dead_mx, NULL);
-		//muss theoretischc protected werden
-	(*data)->start = get_time();
-	//muss das vor dem thread_cerate passieren doer egal?
-	//bei dir davor weil du das data_init nicht lockst
-	(*data)->dead = false;
-	// (*data)->right = true;
-	// (*data)->left = true;
+	head = (*data)->first_ph;
 	while (1)
 	{
-		// head->name = "romy";
 		head->id = i;
 		head->burgers = 0;
 		head->args = (*data);
@@ -159,20 +94,34 @@ int	create_phillys(t_data **data)
 		if (pthread_create(&head->thread, NULL, &routine, head) != 0)
 		{
 			free_phillys(data, (*data)->noph);
-			//maybe print_mx
-			printf("failed to create thread\n");
-			return (1);
+			return (2);
 		}
 		head = head->next;
 		if (head == (*data)->first_ph)
 			break ;
 		i++;
 	}
-	//eine variante hier den waiter_thread einfugen mit anderer routine
-	//und dann auch beim joinen
-	//if (pthread_create(data->your_mum, NULL, kills_you, data) != 0);
-	if (join_phillys((data)))
+	return (0);
+}
+
+int	create_phillys(t_data **data)
+{
+	t_philly	*head;
+
+	(*data)->created_all = false;
+	head = philly_cdll(data);
+	if (head == NULL)
 		return (1);
-	// pthread_mutex_destroy(&mutex_fork);
+	if (pthread_mutex_init(&(*data)->print_mx, NULL) != 0)
+		return (2);
+	if (pthread_mutex_init(&(*data)->dead_mx, NULL) != 0)
+		return (2);
+	(*data)->start = get_time();
+	(*data)->dead = false;
+	if (init_philly(data))
+		return (2);
+	(*data)->created_all = true;
+	if (join_phillys(data))
+		return (2);
 	return (0);
 }

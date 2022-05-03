@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/29 12:41:43 by rschleic          #+#    #+#             */
-/*   Updated: 2022/04/29 12:41:46 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/03 19:54:25 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,30 +15,15 @@
 int	max_min_check(t_data *data)
 {
 	if (data->noph > INT_MAX || data->noph < INT_MIN)
-	{
-		printf("wrong input\n");
 		return (1);
-	}
 	else if (data->ttd > INT_MAX || data->ttd < INT_MIN)
-	{
-		printf("wrong input\n");
 		return (1);
-	}
 	else if (data->tte > INT_MAX || data->tte < INT_MIN)
-	{
-		printf("wrong input\n");
 		return (1);
-	}
 	else if (data->tts > INT_MAX || data->tts < INT_MIN)
-	{
-		printf("wrong input\n");
 		return (1);
-	}
 	else if (data->notephme > INT_MAX || data->notephme < INT_MIN)
-	{
-		printf("wrong input\n");
 		return (1);
-	}
 	return (0);
 }
 
@@ -53,14 +38,17 @@ int	init_args(char **argv, t_data *data)
 	else
 		data->notephme = -1;
 	if (max_min_check(data) == 1)
+	{
+		printf("wrong input\n");
 		return (1);
+	}
 	return (0);
 }
 
 int	input_check(int x, char **argv)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 1;
 	if (x < 5 || x > 6)
@@ -86,4 +74,4 @@ int	input_check(int x, char **argv)
 	}
 	return (0);
 }
-//was passeirt denn bei einer 0 ?
+//no fucking clue how to get rid of one line
