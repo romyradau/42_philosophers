@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 15:06:03 by rschleic          #+#    #+#             */
-/*   Updated: 2022/05/03 20:45:16 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/04 11:03:59 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ typedef struct s_data
 	bool			created_all;
 	pthread_mutex_t	dead_mx;
 	pthread_mutex_t	print_mx;
+	pthread_mutex_t	init_mx;
 	struct s_philly	*first_ph;
 }	t_data;
 

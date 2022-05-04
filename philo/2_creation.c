@@ -6,7 +6,7 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/03 19:54:40 by rschleic          #+#    #+#             */
-/*   Updated: 2022/05/03 20:15:10 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/04 11:25:17 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,11 +116,15 @@ int	create_phillys(t_data **data)
 		return (2);
 	if (pthread_mutex_init(&(*data)->dead_mx, NULL) != 0)
 		return (2);
+	if (pthread_mutex_init(&(*data)->init_mx, NULL) != 0)
+		return (2);
 	(*data)->start = get_time();
 	(*data)->dead = false;
 	if (init_philly(data))
 		return (2);
+	pthread_mutex_lock(&(*data)->init_mx);
 	(*data)->created_all = true;
+	pthread_mutex_unlock(&(*data)->init_mx);
 	if (join_phillys(data))
 		return (2);
 	return (0);

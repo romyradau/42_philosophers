@@ -6,32 +6,11 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/03 14:30:20 by rschleic          #+#    #+#             */
-/*   Updated: 2022/05/03 20:43:52 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/04 11:38:51 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-void	free_phillys(t_data **data, int i)
-{
-	t_philly	*current;
-	t_philly	*next_ph;
-
-	current = (*data)->first_ph;
-	while (i > 1)
-	{
-		if (current->next)
-			next_ph = current->next;
-		pthread_mutex_destroy(&current->right_fork);
-		free(current);
-		current = NULL;
-		current = next_ph;
-		i--;
-	}
-	pthread_mutex_destroy(&current->right_fork);
-	free(current);
-	current = NULL;
-}
 
 int	print_message(t_philly *philly, t_data **data, const char *message)
 {
@@ -74,17 +53,28 @@ int	your_mum_calls(t_philly *philly, t_data *data)
 	return (0);
 }
 
+void	wait_and_go(t_data *data, t_philly *philly)
+{
+	pthread_mutex_lock(&data->init_mx);
+	while (data->created_all == false)
+	{
+		pthread_mutex_unlock(&data->init_mx);
+		usleep(100);
+		pthread_mutex_lock(&data->init_mx);
+	}
+	pthread_mutex_unlock(&data->init_mx);
+	if (philly->id % 2 == 0)
+		add_time(data->tte - 10, philly, data);
+}
+
 void	*routine(void *input)
 {
 	t_philly	*philly;
 	int			meals;
 
 	philly = (t_philly *)input;
-	while (philly->args->created_all == false)
-		usleep(100);
+	wait_and_go(philly->args, philly);
 	meals = philly->args->notephme;
-	if (philly->id % 2 == 0)
-		add_time(philly->args->tte - 10, philly, philly->args);
 	pthread_mutex_lock(&philly->args->dead_mx);
 	while ((philly->burgers < meals || !philly->args->dead))
 	{
@@ -121,6 +111,7 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
+		system("leaks philo");
 		pthread_mutex_destroy(&data->print_mx);
 		pthread_mutex_destroy(&data->dead_mx);
 		free_phillys(&data, data->noph);

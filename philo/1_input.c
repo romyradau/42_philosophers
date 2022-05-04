@@ -6,11 +6,32 @@
 /*   By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/29 12:41:43 by rschleic          #+#    #+#             */
-/*   Updated: 2022/05/03 19:54:25 by rschleic         ###   ########.fr       */
+/*   Updated: 2022/05/04 11:36:28 by rschleic         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	free_phillys(t_data **data, int i)
+{
+	t_philly	*current;
+	t_philly	*next_ph;
+
+	current = (*data)->first_ph;
+	while (i > 1)
+	{
+		if (current->next)
+			next_ph = current->next;
+		pthread_mutex_destroy(&current->right_fork);
+		free(current);
+		current = NULL;
+		current = next_ph;
+		i--;
+	}
+	pthread_mutex_destroy(&current->right_fork);
+	free(current);
+	current = NULL;
+}
 
 int	max_min_check(t_data *data)
 {
@@ -45,17 +66,24 @@ int	init_args(char **argv, t_data *data)
 	return (0);
 }
 
+int	n_of_args(int x)
+{
+	if (x < 5 || x > 6)
+	{
+		printf("wrong number of arguments\n");
+		return (1);
+	}
+	return (0);
+}
+
 int	input_check(int x, char **argv)
 {
 	int	i;
 	int	j;
 
 	i = 1;
-	if (x < 5 || x > 6)
-	{
-		printf("wrong number of arguments\n");
+	if (n_of_args(x))
 		return (1);
-	}
 	while (argv[i])
 	{
 		j = 0;
